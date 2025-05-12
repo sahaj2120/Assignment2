@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Student Name: Sahaj Patel
+# Student ID: 24557489
+
+# The first argument will be the input file, on which we will check the empty cells.
+provided_txt_file="$1"
+
+# Checking if the provided file is empty or file does not exist.
+if [[ ! -s "$provided_txt_file" ]]; then
+    echo "Error: The file '$provided_txt_file' either is empty or does not exist."
+    exit 1
+fi
+
+# Reading the header of the provided file and checking if the header is empty or not.
+header_line=$(head -n 1 "$provided_txt_file")
+
+if [[ -z "$header_line" ]]; then
+    echo "Error: The header line in '$provided_txt_file' is empty."
+    exit 1
+fi
