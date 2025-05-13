@@ -3,7 +3,7 @@
 # Student Name: Sahaj Patel
 # Student ID: 24557489
 
-# The first argument will be the input file, on which we will check the empty cells.
+# The first argument is the input file to check the empty cells.
 provided_txt_file="$1"
 
 # Checking if the provided file is empty or file does not exist.
@@ -19,3 +19,45 @@ if [[ -z "$header_line" ]]; then
     echo "Error: The header line in '$provided_txt_file' is empty."
     exit 1
 fi
+
+# Replace spaces in column names with underscores (to handle multi-word column names)
+header_line_modified=$(echo "$header_line" | sed 's/ /_/g')
+
+# Split the header into columns, keeping the columns intact
+columns=($(echo "$header_line_modified" | tr ';' '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'))
+
+# Loop through each column and count empty cells
+for col in "${columns[@]}"
+do
+    # Revert underscores back to spaces
+    col_original=$(echo "$col" | sed 's/_/ /g')
+    
+    # Initialize the empty cell count to 0
+    empty_count=0
+
+    # Get the column number dynamically
+    col_num=$(head -n 1 "$provided_txt_file" | tr ';' '\n' | grep -n -m 1 -F "$col_original" | cut -d: -f1)
+
+    # Check if we successfully found the column number
+    if [[ -z "$col_num" ]]; then
+        echo "Error: Column '$col_original' not found in the file."
+        continue
+    fi
+
+    # Count the empty cells in the column using awk and trim spaces from each cell
+    empty_count=$(awk -F';' -v col_num="$col_num" '{
+        # Trim spaces from each column cell
+        gsub(/^[[:space:]]+|[[:space:]]+$/, "", $col_num)
+        if ($col_num == "") count++
+    } END {
+        print count
+    }' "$provided_txt_file")
+
+    # Handle the case where no empty cells are found
+    if [[ -z "$empty_count" ]]; then
+        empty_count=0
+    fi
+
+    # Output the result for the column
+    echo "$col_original: $empty_count"
+done
