@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Student Name: Sahaj Patel
+# Student ID: 24557489
+
+# Will require the text file to perform the preprocessing. Therefore the first argument would be the provided text file.
+provided_txt_file="$1"
+
+# Will check if the input file is provided or not.
+if [ -z "$provided_txt_file" ]; then
+    echo "Please provide the input file"
+    exit 1
+fi
