@@ -11,3 +11,16 @@ if [ -z "$provided_txt_file" ]; then
     echo "Please provide the input file"
     exit 1
 fi
+
+# Step 1–2: Convert semicolon to tab and Windows line endings to Unix
+step1=$(cat "$provided_txt_file" | tr ';' '\t' | sed 's/\r//')
+
+# Step 3: Replace commas with periods for floating-point numbers
+step2=$(echo "$step1" | awk -F'\t' 'BEGIN {OFS="\t"} {
+    for (i=1; i<=NF; i++) {
+        if ($i ~ /^[0-9]+([,.][0-9]+)?$/) {
+            gsub(",", ".", $i)
+        }
+    }
+    print $0
+}')
